@@ -1,8 +1,14 @@
+
+
 #include "testApp.h"
+#include "simulation_main.h"
 
 //--------------------------------------------------------------
 void testApp::setup(){
-
+	ofSetVerticalSync(true);
+	ofSetFrameRate(60);
+	ofBackground( 255, 255, 255 ); //Set white background
+	simulation_main();
 }
 
 //--------------------------------------------------------------
@@ -12,8 +18,11 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-
-}
+	ofSetColor( 0, 0, 0 ); //Set black color
+	ofLine( 10, 10, 10, 100 );
+	ofLine( 10, 100, 100, 100 );
+	ofLine( 100, 100, 10, 10 );
+}	
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
