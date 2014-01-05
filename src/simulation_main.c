@@ -44,24 +44,20 @@ sp_carSimulation sp_simulation;
 
 
 
-void simulation_main(){
+sp_simulationReturnItem simulation_main(){
     #ifdef TESTS
     testGetTriangleDist();
     return;
     #endif
 
-//#ifndef STRIP_DOWN
     sp_simulation = initializeCarSim();
-//#endif
     FILE *file;
     file = fopen("file.csv","w"); 
 
     int line = 0;
     fprintf(file,"line,MS,x,y,angle,steeringAngle,speed,ACC,stearingCmd,PowerCmd,debug,");
     fprintf(file,"GPS_x,GPS_y,Compass,Encoder_L,Encoder_R,fusion_x,fusion_y,fusion_angle\n");
-//#ifndef STRIP_DOWN
     simulation_print_data(sp_simulation,file, line++);
-//#endif
     fprintf(file,"0,0,0\n");
     int x;
     
@@ -71,19 +67,18 @@ void simulation_main(){
     
     float x_goal[10] = {30, 30,-30,-30, 20,20,-20,-20}; //turn left box
     float y_goal[10] = {-20 ,30,  30,-30,-30,20 ,20,-20}; //turn left box
-//#ifndef STRIP_DOWN
     s_routePlanner_return cmd = gotoWaypoint(0, 0, x_goal[0], y_goal[0], 0);
     sp_simulation->steeringPercentAngleCmd = cmd.steeringCmd;
     sp_simulation->powerPercentCmd = cmd.power;
-//#endif
     
+	sp_simulationReturnItem sp_returnData = (sp_simulationReturnItem)malloc(sizeof(s_simulationReturnItem));
+
     for(x = 0; x<20000; x++)
     {
 
         simulation_update(sp_simulation);
 
         s_fusion_return fusion = sensorFusionAndMapping();
-//#ifndef STRIP_DOWN
         s_routePlanner_return cmd = gotoWaypoint(fusion.x, fusion.y, x_goal[goalCounter], y_goal[goalCounter], fusion.angle);
         sp_simulation->steeringPercentAngleCmd = cmd.steeringCmd;
         sp_simulation->powerPercentCmd = cmd.power;
@@ -94,13 +89,16 @@ void simulation_main(){
 
         if(x%10==0)
         {
+			sp_returnData->x[x/10] = sp_simulation->x; sp_returnData->y[x/10] = sp_simulation->y; sp_returnData->angle[x/10] = sp_simulation->angle;
+			
             simulation_print_data(sp_simulation, file, line++);
             fprintf(file,"%f,%f,%f\n",fusion.x,fusion.y,fusion.angle);
+			sp_returnData->fusion_x[x/10] = fusion.x; sp_returnData->fusion_y[x/10] = fusion.y; sp_returnData->fusion_angle[x/10] = fusion.angle;
             //printf("%f,%f,%f\n",fusion.x,fusion.y,fusion.angle);
         }
-//#endif
     }
     fclose(file); /*done!*/ 
+	return sp_returnData;
 }
 
 

@@ -30,6 +30,12 @@ typedef struct{
     float angle;
 }s_fusion_return;
 
+
+
+
+
+
+
 extern sp_carSimulation sp_simulation;
 
 //////////////  FUNCTION DELCARATION  //////////////
